@@ -9,13 +9,13 @@ fn main() -> io::Result<()> {
 }
 
 
-enum match_result {
+enum MatchResult {
     Loss = 0,
     Draw = 3,
     Win = 6
 }
 
-enum rival_move {
+enum RivalMove {
     A, //rock
     B, //paper
     C, //scissors
