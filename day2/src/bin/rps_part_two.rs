@@ -17,26 +17,42 @@ enum RPSMove {
     Scissors,
 }
 
-fn find_move(a: &str) -> RPSMove {
-    match a {
-        "A" | "X" => RPSMove::Rock,
-        "B" | "Y" => RPSMove::Paper,
-        "C" | "Z" => RPSMove::Scissors,
-        _ => panic!("Invalid value read"),
+impl RPSMove {
+    fn new(a: &str) -> RPSMove {
+        match a {
+            "A" => RPSMove::Rock,
+            "B" => RPSMove::Paper,
+            "C" => RPSMove::Scissors,
+            _ => panic!("Invalid value read")
+        }
     }
 }
 
-fn play_round(rival_move: RPSMove, player_move: RPSMove) -> RPSMatchResult {
-    let round = (rival_move, player_move);
+impl RPSMatchResult {
+    fn new(a: &str) -> RPSMatchResult {
+        match a {
+            "X" => Self::Loss,
+            "Y" => Self::Draw,
+            "Z" => Self::Win,
+            _ => panic!("Invalid value read")
+        }
+    }
+}
+
+fn guess_move(rival_move: RPSMove, match_result: RPSMatchResult) -> RPSMove {
+    use RPSMatchResult::{Draw, Loss, Win};
+    use RPSMove::{Rock, Paper, Scissors};
+
+    let round = (rival_move, match_result);
 
     match round {
-        (RPSMove::Rock, RPSMove::Paper)
-        | (RPSMove::Paper, RPSMove::Scissors)
-        | (RPSMove::Scissors, RPSMove::Rock) => RPSMatchResult::Win,
-        (RPSMove::Paper, RPSMove::Rock)
-        | (RPSMove::Scissors, RPSMove::Paper)
-        | (RPSMove::Rock, RPSMove::Scissors) => RPSMatchResult::Loss,
-        (_, _) => RPSMatchResult::Draw,
+        (Rock, Loss)
+        | (Paper, Win)
+        | (Scissors, Draw) => Scissors,
+        (Paper, Loss)
+        | (Scissors, Win)
+        | (Rock, Draw) => Rock,
+        (_, _) => Paper,
     }
 }
 
@@ -50,10 +66,10 @@ fn main() -> io::Result<()> {
         let line = line?;
         let rps_match: Vec<&str> = line.split(' ').collect();
 
-        let rival_move = find_move(rps_match[0]);
-        let player_move = find_move(rps_match[1]);
+        let rival_move = RPSMove::new(rps_match[0]);
+        let match_result = RPSMatchResult::new(rps_match[1]);
 
-        let round_points = play_round(rival_move, player_move) as isize + player_move as isize;
+        let round_points = guess_move(rival_move, match_result) as isize + match_result as isize;
 
         player_points += round_points;
     }
